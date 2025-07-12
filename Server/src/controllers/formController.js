@@ -6,21 +6,71 @@ import { Report } from "../models/report.model.js";
 import { User } from "../models/user1.model.js";
 import mongoose from "mongoose";
 
-// 📘 Questions
+import cloudinary from "cloudinary";
+import fs from "fs";
+import path from "path";
+import multer from "multer";
+
+// Cloudinary config
+cloudinary.v2.config({
+    cloud_name: "dicsxtvo5",
+    api_key: "695662827553358",
+    api_secret: "N7eChks-_HscnXxM7xANnjaNR6A",
+    timeout: 120000
+});
+
+// Ensure upload directory exists
+const uploadDir = "./uploads";
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
+
+// Multer config
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+
+export const upload = multer({ storage: storage });
+
+// Main controller
 export const createQuestion = async (req, res) => {
     try {
         const { title, description, tags } = req.body;
         const userId = req.user._id;
- 
+
+        let images = [];
+
+        if (req.files && req.files.length > 0) {
+            const uploadPromises = req.files.map((file) =>
+                cloudinary.v2.uploader.upload(file.path, {
+                    folder: "question-images",
+                    resource_type: "auto"
+                })
+            );
+
+            const uploadResults = await Promise.all(uploadPromises);
+            images = uploadResults.map(upload => upload.secure_url);
+
+            // Delete local files
+            req.files.forEach(file => fs.unlinkSync(file.path));
+        }
+
         const newQuestion = await Question.create({
             title,
             description,
-            tags,
-            user: userId,
+            tags: tags.split(",").map(t => t.trim()),
+            images,
+            user: userId
         });
 
         res.json(newQuestion);
     } catch (err) {
+        console.error("Error creating question:", err);
         res.status(500).json({ err: err.message });
     }
 };

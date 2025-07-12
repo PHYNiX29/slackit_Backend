@@ -29,11 +29,33 @@ import {
 } from "../controllers/formController.js";
 
 import { authenticateToken } from "../middleware/authMiddleware.js";
-
+import multer from "multer";
+import cloudinary from "cloudinary";
+import dotenv from "dotenv";
+import fs from "fs";
+import path from "path";
 const router = express.Router();
 
+// Ensure upload directory exists
+const uploadDir = "./uploads";
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
+
+// Multer config
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+
+export const upload = multer({ storage: storage });
+
 // 📘 Questions
-router.post("/questions", authenticateToken, createQuestion);
+router.post("/questions", authenticateToken, upload.array("images"),createQuestion);
 router.get("/questions", getAllQuestions);
 router.get("/questions/:id", getQuestionById);
 router.put("/questions/:id", authenticateToken, updateQuestion);

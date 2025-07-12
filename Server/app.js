@@ -50,6 +50,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 dotenv.config();
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const __public = dirname(__dirname) + "/public";
