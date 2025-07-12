@@ -274,51 +274,6 @@ export const acceptReply = async (req, res) => {
 
 // 👍 Votes
 
-// export const voteReply = async (req, res) => {
-//     try {
-//         const { vote } = req.body; // 1 or -1
-//         const userId = req.user._id;
-//         const replyId = req.params.id;
-
-//         const replyObjectId = new mongoose.Types.ObjectId(replyId);
-
-//         const existing = await ReplyVote.findOne({ user: userId, reply: replyObjectId });
-
-//         if (existing) {
-//             if (existing.vote === vote)
-//                 return res.status(400).json({ err: "Already voted" });
-//             existing.vote = vote;
-//             await existing.save();
-//         } else {
-//             await ReplyVote.create({ user: userId, reply: replyObjectId, vote });
-//         }
-
-//         const votes = await ReplyVote.aggregate([
-//             { $match: { reply: replyObjectId } },
-//             { $group: { _id: "$reply", total: { $sum: "$vote" } } }
-//         ]);
-
-//         await Reply.findByIdAndUpdate(replyObjectId, { votes: votes[0]?.total || 0 });
-
-//         // 🔔 Notify reply owner (only on upvote)
-//         if (vote === 1) {
-//             const reply = await Reply.findById(replyObjectId);
-//             if (reply && reply.user.toString() !== userId.toString()) {
-//                 await Notification.create({
-//                     user: reply.user,
-//                     type: "vote",
-//                     message: `Your reply was upvoted.`,
-//                     link: `/questions/${reply.question}#reply-${reply._id}`
-//                 });
-//             }
-//         }
-
-//         res.json({ msg: "Vote recorded" });
-//     } catch (err) {
-//         res.status(500).json({ err: err.message });
-//     }
-// };
-
 // 👍 Upvote a reply
 export const upvote = async (req, res) => {
     try {
@@ -391,24 +346,7 @@ export const downvote = async (req, res) => {
 
 
 
-// export const removeVote = async (req, res) => {
-//     try {
-//         const userId = req.user._id;
-//         const replyId = req.params.id;
 
-//         await ReplyVote.deleteOne({ user: userId, reply: replyId });
-
-//         const votes = await ReplyVote.aggregate([
-//             { $match: { reply: replyId } },
-//             { $group: { _id: "$reply", total: { $sum: "$vote" } } }
-//         ]);
-
-//         await Reply.findByIdAndUpdate(replyId, { votes: votes[0]?.total || 0 });
-//         res.json({ msg: "Vote removed" });
-//     } catch (err) {
-//         res.status(500).json({ err: err.message });
-//     }
-// };
 
 // 🔔 Notifications
 export const getNotifications = async (req, res) => {
