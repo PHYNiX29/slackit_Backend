@@ -13,8 +13,10 @@ import {
     deleteReply,
     acceptReply,
 
-    voteReply,
-    removeVote,
+    // voteReply,
+    // removeVote,
+    upvote,
+    downvote,
 
     getNotifications,
     markNotificationRead,
@@ -71,8 +73,11 @@ router.delete("/replies/:id", authenticateToken, deleteReply);
 router.post("/replies/:id/accept", authenticateToken, acceptReply);
 
 // 👍 Votes
-router.post("/replies/:id/vote", authenticateToken, voteReply);
-router.delete("/replies/:id/vote", authenticateToken, removeVote);
+// router.post("/replies/:id/vote", authenticateToken, voteReply);
+// router.delete("/replies/:id/vote", authenticateToken, removeVote);
+router.post("/replies/:id/upvote", authenticateToken, upvote);
+router.post("/replies/:id/downvote", authenticateToken, downvote);
+
 
 // 🔔 Notifications
 router.get("/notifications", authenticateToken, getNotifications);
