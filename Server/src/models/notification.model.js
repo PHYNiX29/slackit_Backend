@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const notificationSchema = new mongoose.Schema({
     user:     { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    type:     { type: String, enum: ['reply', 'mention', 'comment'], required: true },
+    type:     { type: String, enum: ['reply', 'mention', 'comment','vote'], required: true },
     content:  { type: String, },
     link:     { type: String, required: true },
     isRead:   { type: Boolean, default: false }
